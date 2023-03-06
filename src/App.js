@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import "./index.css";
 
 function App() {
-  const monthTable = [
+  const monthMap = [
     "Janvier",
     "Février",
     "Mars",
@@ -17,14 +17,13 @@ function App() {
     "Décembre",
   ];
   const d = new Date();
-  const currentMonth = monthTable[d.getMonth()];
+  const currentMonth = monthMap[d.getMonth()];
   const currentYear = d.getFullYear();
 
-  const totalAmountDue = 600;
-  let monthlyPayment = 27;
-  const repaymentPeriod = totalAmountDue / monthlyPayment;
+  const [totalLoan, setTotalLoan] = useState(6000);
+  const [monthlyPmt, setMonthlyPmt] = useState(100);
 
-  const repaymentRowTemplate = (month, year, cumul, rest) => {
+  const repaymentRowTemplate = (month, year, cumul, rest, monthlyPayment) => {
     return (
       <>
         <td>{`${month} / ${year}`}</td>
@@ -37,26 +36,32 @@ function App() {
 
   const repaymentRows = [];
   const repaymentRowsInit = () => {
+    let totalAmountDue = totalLoan;
+    let monthlyPayment = monthlyPmt;
+    let repaymentPeriod = Math.ceil(totalAmountDue / monthlyPayment);
+    console.log(repaymentPeriod);
     let index = repaymentPeriod;
     let month = currentMonth;
     let year = currentYear;
     let cumul = monthlyPayment;
-    let rest = totalAmountDue - monthlyPayment;
+    let restToPay = totalAmountDue - monthlyPayment;
     while (index > 0) {
-      repaymentRows.push(repaymentRowTemplate(month, year, cumul, rest));
+      repaymentRows.push(
+        repaymentRowTemplate(month, year, cumul, restToPay, monthlyPayment)
+      );
       const newMonth =
-        monthTable.indexOf(month) + 1 >= monthTable.length
-          ? monthTable[0]
-          : monthTable[monthTable.indexOf(month) + 1];
+        monthMap.indexOf(month) + 1 >= monthMap.length
+          ? monthMap[0]
+          : monthMap[monthMap.indexOf(month) + 1];
       month = newMonth;
-      year = monthTable.indexOf(month) == 0 ? year + 1 : year;
+      year = monthMap.indexOf(month) == 0 ? year + 1 : year;
       if (cumul + monthlyPayment <= totalAmountDue) {
         cumul = cumul + monthlyPayment;
-        rest = totalAmountDue - cumul;
+        restToPay = totalAmountDue - cumul;
       } else {
         cumul = totalAmountDue;
-        monthlyPayment = rest;
-        rest = 0;
+        monthlyPayment = restToPay;
+        restToPay = 0;
       }
       index--;
     }
@@ -70,6 +75,34 @@ function App() {
 
   return (
     <div>
+      <div>
+        <label>
+          Montant total à rembourser
+          <input
+            value={totalLoan}
+            onChange={(e) => setTotalLoan(e.target.value)}
+          />
+        </label>
+      </div>
+      <div>
+        <label>
+          Mensualités
+          <input
+            value={monthlyPmt}
+            onChange={(e) => setMonthlyPmt(e.target.value)}
+          />
+        </label>
+      </div>
+      <div>
+        <label>
+          <input
+            value="Générer l'échéancier"
+            type="submit"
+            onClick={handleClick}
+          />
+        </label>
+      </div>
+      <hr />
       <table>
         <thead>
           <tr>
