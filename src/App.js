@@ -16,42 +16,64 @@ function App() {
     "Novembre",
     "Décembre",
   ];
+  const d = new Date();
+  const currentMonth = monthTable[d.getMonth()];
+  const currentYear = d.getFullYear();
 
   const totalAmountDue = 6000;
   const monthlyPayment = 100;
   const repaymentPeriod = totalAmountDue / monthlyPayment;
-  const repaymentRows = () => {
+
+  const repaymentRowTemplate = (month, year, cumul, rest) => {
     return (
-      <tr>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-      </tr>
+      <>
+        <td>{`${month} / ${year}`}</td>
+        <td>{monthlyPayment}€</td>
+        <td>{cumul}€</td>
+        <td>{rest}€</td>
+      </>
     );
   };
 
-  React.useEffect(() => {
-    console.log("***repaymentPeriod : " + repaymentPeriod);
-  }, []);
+  const repaymentRows = [];
+  const repaymentRowsInit = () => {
+    let index = repaymentPeriod;
+    let month = currentMonth;
+    let year = currentYear;
+    let cumul = monthlyPayment;
+    let rest = totalAmountDue - monthlyPayment;
+    while (index > 0) {
+      repaymentRows.push(repaymentRowTemplate(month, year, cumul, rest));
+      const newMonth =
+        monthTable.indexOf(month) + 1 >= monthTable.length
+          ? monthTable[0]
+          : monthTable[monthTable.indexOf(month) + 1];
+      month = newMonth;
+      console.log(monthTable.indexOf(month));
+      year = monthTable.indexOf(month) == 0 ? year + 1 : year;
+      cumul = cumul + monthlyPayment;
+      rest = rest - monthlyPayment;
+      index--;
+    }
+  };
+  repaymentRowsInit();
 
   return (
     <div>
       <table>
         <thead>
           <tr>
-            <th>Année</th>
+            <th>Mois / Année</th>
             <th>Mensualités</th>
             <th>Cumule</th>
             <th>Reste</th>
-            {/* {monthTable.map((month, id) => (
-            <th  key={id}>
-            {month}
-            </th>
-          ))} */}
           </tr>
         </thead>
-        <tbody>{repaymentRows()}</tbody>
+        <tbody>
+          {repaymentRows.map((row, i) => (
+            <tr key={`échéance-${i}`}>{row}</tr>
+          ))}
+        </tbody>
       </table>
     </div>
   );
