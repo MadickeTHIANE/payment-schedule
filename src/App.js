@@ -21,7 +21,7 @@ function App() {
   const currentYear = d.getFullYear();
 
   const totalAmountDue = 6000;
-  const monthlyPayment = 100;
+  let monthlyPayment = 38;
   const repaymentPeriod = totalAmountDue / monthlyPayment;
 
   const repaymentRowTemplate = (month, year, cumul, rest) => {
@@ -49,10 +49,15 @@ function App() {
           ? monthTable[0]
           : monthTable[monthTable.indexOf(month) + 1];
       month = newMonth;
-      console.log(monthTable.indexOf(month));
       year = monthTable.indexOf(month) == 0 ? year + 1 : year;
-      cumul = cumul + monthlyPayment;
-      rest = rest - monthlyPayment;
+      if (cumul + monthlyPayment <= totalAmountDue) {
+        cumul = cumul + monthlyPayment;
+        rest = totalAmountDue - cumul;
+      } else {
+        cumul = totalAmountDue;
+        monthlyPayment = rest;
+        rest = 0;
+      }
       index--;
     }
   };
