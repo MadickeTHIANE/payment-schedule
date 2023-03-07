@@ -20,8 +20,8 @@ function App() {
   const currentMonth = monthTable[d.getMonth()];
   const currentYear = d.getFullYear();
 
-  const totalAmountDue = 6000;
-  let monthlyPayment = 38;
+  const totalAmountDue = 600;
+  let monthlyPayment = 27;
   const repaymentPeriod = totalAmountDue / monthlyPayment;
 
   const repaymentRowTemplate = (month, year, cumul, rest) => {
@@ -61,7 +61,12 @@ function App() {
       index--;
     }
   };
-  repaymentRowsInit();
+
+  if (monthlyPayment >= totalAmountDue) {
+    alert("Mensualité trop élevée");
+  } else {
+    repaymentRowsInit();
+  }
 
   return (
     <div>
